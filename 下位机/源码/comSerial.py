@@ -43,9 +43,9 @@ def GetFile(ser, fileName):
     f.close()
     ser.write(str(len(data)))
     time.sleep(1)
-    print str(len(data))
     dataSize = ser.inWaiting()
-    print ser.read(dataSize)
+    if dataSize > 0:
+        print ser.read(dataSize)
 
 
 def main():
