@@ -12,7 +12,7 @@ def main():
     f.close()
     
     try:
-        ser = serial.Serial(port='COM4', baudrate=115200, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, rtscts = True)
+        ser = serial.Serial(port='COM3', baudrate=921600, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_TWO, bytesize=serial.EIGHTBITS, rtscts = True)
     except Exception, e:
         print e
         return
@@ -25,13 +25,15 @@ def main():
     
     if serDataLen > 0:
         serData += ser.read(serDataLen)
-        print serData
         ser.write(str(int(serData) + 1))
         time.sleep(2)
         ser.write(fileName + ' ' + data)
-    ser.write('233333')
-
-
+        time.sleep(1)
+        ser.write('233333')
+        time.sleep(1)
+        serDataLen = ser.inWaiting()
+        data = ser.read(serDataLen)
+        ser.write(data)
 
 if __name__ == '__main__':
     main()
