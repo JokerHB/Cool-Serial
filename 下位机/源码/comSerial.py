@@ -1,0 +1,88 @@
+# -*- coding: UTF-8 -*-
+
+import os
+import sys
+import time
+import serial
+
+from random import randint
+randomNumber = randint(0, 255)
+
+def IOAcept(ser):
+    global randomNumber
+    
+    # for i in range(1, 10):
+    print randomNumber
+    ser.write(str(randomNumber))
+    time.sleep(1)
+    dataSize = ser.inWaiting()
+    if dataSize > 0:
+        print ser.read(dataSize)
+        return True
+        # randomBack = str(ser.read(dataSize))
+        # try:
+        #     randomBack = int(randomBack)
+        # except Exception, e:
+        #     print e
+        #     continue
+        # if randomBack == randomNumber + 1:
+        #     return True
+    time.sleep(0.5)
+    return False
+
+def GetFileName(ser):
+    fileName = ''
+    data = ser.read()
+    while data != ' ':
+        fileName += str(data)
+        data = ser.read()
+    print fileName
+    return fileName
+
+def GetFile(ser, fileName):
+    f = open(fileName, 'wb')
+    fileSize = ser.inWaiting()
+    data = ''
+    while(fileSize >= 0):
+        if fileSize > 0:
+            # ser.write(str(fileSize))
+            print fileSize
+            data += ser.read(fileSize)
+            if data[len(data) - len('233333'):] == '233333':
+                data = data[:len(data) - len('233333')]
+                break
+        fileSize = ser.inWaiting()
+        # time.sleep(1)
+    f.write(data)
+    f.close()
+    ser.write(str(len(data)))
+    time.sleep(1)
+    print str(len(data))
+    dataSize = ser.inWaiting()
+    print ser.read(dataSize)
+    # while dataSize <= 0:
+    #     ser.write(str(len(data)))
+    #     time.sleep(1)
+    #     dataSize = ser.inWaiting()
+
+
+def main():
+    currentTime = time.time()
+    try:
+        ser = serial.Serial(timeout=0, port='/dev/ttyUSB0', baudrate=int(sys.argv[1]), parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_TWO, bytesize=serial.EIGHTBITS, rtscts = True)
+    except Exception, e:
+        print e
+        return
+    
+    ser.flushInput()
+    ser.flushOutput()
+    
+    if IOAcept(ser):
+        filename = '/home/pi/' + GetFileName(ser)
+        GetFile(ser, filename)
+        os.system('sudo chmod 777 ' + filename)
+    ser.close()
+    print time.time() - currentTime
+
+if __name__ == '__main__':
+    main()
