@@ -15,7 +15,7 @@ def IOAcept(ser):
     time.sleep(1)
     dataSize = ser.inWaiting()
     if dataSize > 0:
-        ser.read(dataSize)
+        print ser.read(dataSize)
         return True
     time.sleep(0.5)
     return False
@@ -29,14 +29,15 @@ def GetFileName(ser):
     return fileName
 
 def GetFile(ser, fileName):
+    checkEOF = '7e72284ae5603ef27035446b5946c36c'
     f = open(fileName, 'wb')
     fileSize = ser.inWaiting()
     data = ''
     while(fileSize >= 0):
         if fileSize > 0:
             data += ser.read(fileSize)
-            if data[len(data) - len('233333'):] == '233333':
-                data = data[:len(data) - len('233333')]
+            if data[len(data) - len(checkEOF):] == checkEOF:
+                data = data[:len(data) - len(checkEOF)]
                 break
         fileSize = ser.inWaiting()
     f.write(data)
