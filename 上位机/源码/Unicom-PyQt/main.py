@@ -210,17 +210,27 @@ class Main(QWidget):
                 serData += self.__ser__.ReadData(serDataLen)
                 print serData
                 self.__ser__.WriteData(str(int(serData) + 1))
-                sleep(2)
+                sleep(1)
                 self.__ser__.WriteData(shortname + ' ' + data + checkEOF)
                 sleep(1)
-                # self.__ser__.WriteData('233333')
+                from hashlib import md5
+                m2 = md5()
+                m2.update(data)
+                print m2.hexdigest()
+                md5Value = m2.hexdigest()
+                self.__ser__.WriteData(md5Value)
                 sleep(1)
                 serDataLen = self.__ser__.InWaiting()
                 data = self.__ser__.ReadData(serDataLen)
                 print data
-                self.__ser__.WriteData(data)
-                if int(data) == filelen:
+                self.__ser__.WriteData(md5Value)
+                if data == md5Value:
                     QMessageBox.question(self, 'Info', 'Success', QMessageBox.Yes)
+                else:
+                    QMessageBox.question(self, 'Info', 'Faild', QMessageBox.Yes)
+                self.__ser__.FlushIO()
+            else:
+                QMessageBox.question(self, 'Info', 'Faild', QMessageBox.Yes)
                 self.__ser__.FlushIO()
 
 if __name__ == '__main__':

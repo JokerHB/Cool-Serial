@@ -42,11 +42,18 @@ def GetFile(ser, fileName):
         fileSize = ser.inWaiting()
     f.write(data)
     f.close()
-    ser.write(str(len(data)))
-    time.sleep(1)
+    from hashlib import md5
+    m2 = md5()
+    m2.update(data)   
+    print m2.hexdigest()   
+    ser.write(str(m2.hexdigest()))
+    time.sleep(2.5)
     dataSize = ser.inWaiting()
     if dataSize > 0:
-        print ser.read(dataSize)
+        print 'hh, %s' % (ser.read(dataSize))
+    ser.flush()
+    ser.flushInput()
+    ser.flushOutput()
 
 
 def main():
@@ -59,6 +66,7 @@ def main():
     
     ser.flushInput()
     ser.flushOutput()
+    ser.flush()
     
     if IOAcept(ser):
         print 'begin rev'

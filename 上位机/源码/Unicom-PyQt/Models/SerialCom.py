@@ -42,7 +42,7 @@ class SerialCom(object):
             self.__ser__.flush()
 
     def IsOpen(self):
-        if self.__ser__ == None:
+        if hasattr(self, '__ser__') == False or self.__ser__ == None:
             return False
         return True
 
